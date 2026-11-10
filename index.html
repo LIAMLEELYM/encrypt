@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; base-uri 'none'; form-action 'none'">
+<title>CRYPT//LOCAL · AES-256-GCM</title>
+<style>
+:root{--bg:#04070d;--panel:rgba(10,18,32,.78);--line:rgba(0,229,255,.28);--text:#d6f6ff;--mute:#6b8fa3;--a:#00e5ff;--b:#a855f7;--ok:#39ff88;--bad:#ff3b6b;--warn:#ffb020}
+:root.green{--line:rgba(57,255,136,.3);--a:#39ff88;--b:#00e5ff;--text:#d8ffe8;--mute:#6ba385}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;color:var(--text);padding:28px 16px 40px;background:var(--bg);
+ font-family:ui-monospace,"SF Mono","JetBrains Mono",Consolas,"PingFang TC","Microsoft JhengHei",monospace;overflow-x:hidden}
+body::before{content:"";position:fixed;inset:0;z-index:-2;
+ background:linear-gradient(var(--line) 1px,transparent 1px) 0 0/48px 48px,linear-gradient(90deg,var(--line) 1px,transparent 1px) 0 0/48px 48px;
+ opacity:.18;animation:grid 14s linear infinite;mask-image:radial-gradient(ellipse at 50% 20%,#000 20%,transparent 75%)}
+body::after{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
+ background:radial-gradient(600px 300px at 15% 0%,rgba(168,85,247,.22),transparent),radial-gradient(600px 300px at 90% 10%,rgba(0,229,255,.18),transparent),
+ repeating-linear-gradient(0deg,rgba(255,255,255,.025) 0 1px,transparent 1px 3px)}
+@keyframes grid{to{background-position:0 48px,48px 0}}
+@keyframes pulse{50%{opacity:.35}}
+@keyframes scan{from{transform:translateX(-100%)}to{transform:translateX(100%)}}
+.wrap{max-width:760px;margin:0 auto}
+header{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:18px}
+h1{margin:0;font-size:1.35rem;letter-spacing:.14em;color:var(--a);text-shadow:0 0 12px var(--a)}
+h1 small{display:block;font-size:.7rem;letter-spacing:.2em;color:var(--mute);text-shadow:none;margin-top:4px}
+.tools button{background:transparent;color:var(--a);border:1px solid var(--line);padding:6px 12px;margin-left:6px;cursor:pointer;font:inherit;font-size:.8rem;letter-spacing:.08em;clip-path:polygon(8px 0,100% 0,100% calc(100% - 8px),calc(100% - 8px) 100%,0 100%,0 8px)}
+.tools button:hover{background:rgba(0,229,255,.12);box-shadow:0 0 12px var(--line)}
+.card{position:relative;background:var(--panel);backdrop-filter:blur(10px);border:1px solid var(--line);padding:24px;
+ box-shadow:0 0 40px rgba(0,229,255,.08),inset 0 0 40px rgba(0,229,255,.03)}
+.card::before,.card::after{content:"";position:absolute;width:18px;height:18px;border:2px solid var(--a);filter:drop-shadow(0 0 6px var(--a))}
+.card::before{top:-2px;left:-2px;border-right:0;border-bottom:0}
+.card::after{bottom:-2px;right:-2px;border-left:0;border-top:0}
+.status{display:flex;align-items:center;gap:8px;font-size:.78rem;color:var(--ok);margin-bottom:6px;letter-spacing:.06em}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--ok);box-shadow:0 0 10px var(--ok);animation:pulse 1.6s infinite}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0 4px}
+.chips span{font-size:.7rem;color:var(--a);border:1px solid var(--line);padding:2px 8px;letter-spacing:.05em}
+label{display:block;font-size:.75rem;color:var(--mute);margin:18px 0 6px;letter-spacing:.14em;text-transform:uppercase}
+label::before{content:"> ";color:var(--a)}
+input,textarea{width:100%;background:rgba(0,0,0,.45);color:var(--text);border:1px solid var(--line);padding:12px;font:inherit;font-size:.92rem;outline:none;transition:.2s}
+input:focus,textarea:focus{border-color:var(--a);box-shadow:0 0 0 1px var(--a),0 0 18px rgba(0,229,255,.25)}
+textarea{height:130px;resize:vertical}
+.row{display:flex;gap:8px}
+.mini{background:transparent;color:var(--a);border:1px solid var(--line);padding:0 14px;cursor:pointer;font:inherit;font-size:.8rem;white-space:nowrap}
+.mini:hover{background:rgba(0,229,255,.1)}
+.bar{display:flex;gap:4px;margin-top:10px}
+.bar i{flex:1;height:5px;background:rgba(255,255,255,.08);transition:.25s}
+.hint{font-size:.75rem;color:var(--mute);margin-top:6px;min-height:1.1em}
+.actions{display:flex;gap:12px;margin-top:20px;flex-wrap:wrap}
+.btn{position:relative;overflow:hidden;border:0;padding:12px 26px;font:inherit;font-weight:700;letter-spacing:.14em;cursor:pointer;color:#001018;
+ background:linear-gradient(135deg,var(--a),var(--b));box-shadow:0 0 18px rgba(0,229,255,.35);
+ clip-path:polygon(10px 0,100% 0,100% calc(100% - 10px),calc(100% - 10px) 100%,0 100%,0 10px)}
+.btn:hover{filter:brightness(1.15)}
+.btn.alt{background:transparent;color:var(--a);box-shadow:inset 0 0 0 1px var(--line)}
+.btn:disabled{opacity:.6;cursor:wait}
+.btn.busy::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.55),transparent);animation:scan .8s infinite}
+#msg{min-height:1.4em;margin-top:14px;font-size:.85rem;letter-spacing:.04em}
+.err{color:var(--bad);text-shadow:0 0 8px var(--bad)}.good{color:var(--ok);text-shadow:0 0 8px var(--ok)}
+footer{margin-top:18px;font-size:.72rem;color:var(--mute);line-height:1.7;border-top:1px dashed var(--line);padding-top:12px}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <h1>CRYPT//LOCAL<small id="t_sub"></small></h1>
+  <div class="tools"><button id="lang">EN</button><button id="theme">THEME</button></div>
+</header>
+<div class="card">
+  <div class="status"><span class="dot"></span><span id="t_badge"></span></div>
+  <div class="chips"><span>AES-256-GCM</span><span>PBKDF2-SHA256</span><span>600K ITER</span><span>RANDOM SALT+IV</span></div>
+
+  <label id="t_pw"></label>
+  <div class="row">
+    <input id="pw" type="password" autocomplete="off" spellcheck="false" placeholder="••••••••••••">
+    <button class="mini" id="show"></button>
+  </div>
+  <div class="bar" id="bar"><i></i><i></i><i></i><i></i><i></i></div>
+  <div class="hint" id="strength"></div>
+
+  <label id="t_in"></label>
+  <textarea id="input" spellcheck="false"></textarea>
+
+  <div class="actions">
+    <button class="btn" id="enc"></button>
+    <button class="btn" id="dec"></button>
+    <button class="btn alt" id="clear"></button>
+  </div>
+  <div id="msg"></div>
+
+  <label id="t_out"></label>
+  <textarea id="output" readonly></textarea>
+  <div class="actions"><button class="btn alt" id="copy"></button></div>
+</div>
+<footer id="t_foot"></footer>
+</div>
+
+<script>
+const I18N = {
+  zh:{sub:"本地端到端文字加密終端",badge:"本地運算 · 零上傳 · 連線已封鎖",pw:"密碼短語 / PASSPHRASE",show:"顯示",hide:"隱藏",
+    in:"輸入 / 明文或密文",out:"輸出 / 結果",enc:"加密",dec:"解密",clear:"清除",copy:"複製結果",copied:"[OK] 已複製到剪貼簿",
+    needpw:"[ERR] 請輸入密碼",needin:"[ERR] 請輸入內容",fail:"[ERR] 失敗:密碼錯誤或密文已損壞",oke:"[OK] 加密完成",okd:"[OK] 解密完成",
+    weak:"強度:弱",mid:"強度:中",strong:"強度:強",empty:"建議使用 5 個以上隨機單詞",
+    foot:"密碼請透過另一渠道傳給對方。此工具不隱藏元數據,也不提供前向保密;未經第三方審計,高風險場景請使用 Signal 或 age。"},
+  en:{sub:"LOCAL TEXT ENCRYPTION TERMINAL",badge:"LOCAL COMPUTE · ZERO UPLOAD · NETWORK BLOCKED",pw:"PASSPHRASE",show:"SHOW",hide:"HIDE",
+    in:"INPUT / PLAINTEXT OR CIPHERTEXT",out:"OUTPUT / RESULT",enc:"ENCRYPT",dec:"DECRYPT",clear:"CLEAR",copy:"COPY RESULT",copied:"[OK] Copied to clipboard",
+    needpw:"[ERR] Enter a passphrase",needin:"[ERR] Enter some input",fail:"[ERR] Failed: wrong passphrase or corrupted ciphertext",oke:"[OK] Encrypted",okd:"[OK] Decrypted",
+    weak:"STRENGTH: WEAK",mid:"STRENGTH: MEDIUM",strong:"STRENGTH: STRONG",empty:"Use 5+ random words",
+    foot:"Share the passphrase through a separate channel. No metadata protection or forward secrecy; not independently audited. For high-risk use, prefer Signal or age."}
+};
+let L = navigator.language.startsWith("zh") ? "zh" : "en";
+const $ = id => document.getElementById(id);
+const enc = new TextEncoder(), dec = new TextDecoder();
+const ITER = 600000, VER = 1;
+
+function applyLang(){
+  const t = I18N[L];
+  document.documentElement.lang = L==="zh" ? "zh-Hant" : "en";
+  $("t_sub").textContent=t.sub; $("t_badge").textContent=t.badge; $("t_pw").textContent=t.pw;
+  $("t_in").textContent=t.in; $("t_out").textContent=t.out; $("enc").textContent=t.enc;
+  $("dec").textContent=t.dec; $("clear").textContent=t.clear; $("copy").textContent=t.copy;
+  $("show").textContent = $("pw").type==="password" ? t.show : t.hide;
+  $("t_foot").textContent=t.foot; $("lang").textContent = L==="zh" ? "EN" : "中文";
+  updateStrength();
+}
+
+function updateStrength(){
+  const p=$("pw").value, t=I18N[L], segs=$("bar").children;
+  let pool=0;
+  if(/[a-z]/.test(p))pool+=26; if(/[A-Z]/.test(p))pool+=26; if(/\d/.test(p))pool+=10;
+  if(/[^A-Za-z0-9]/.test(p))pool+=32;
+  const bits = p ? p.length*Math.log2(Math.max(pool,2)) : 0;
+  const n = !p?0: bits<35?1: bits<50?2: bits<75?3: bits<100?4:5;
+  const col = n<=2?"var(--bad)": n===3?"var(--warn)":"var(--ok)";
+  for(let i=0;i<5;i++){segs[i].style.background = i<n ? col : "rgba(255,255,255,.08)"; segs[i].style.boxShadow = i<n ? "0 0 8px "+col : "none";}
+  if(!p){$("strength").textContent=t.empty;return;}
+  $("strength").textContent=(n<=2?t.weak:n===3?t.mid:t.strong)+" (~"+Math.round(bits)+" bits)";
+}
+
+function toB64(u8){let s="";for(let i=0;i<u8.length;i+=0x8000)s+=String.fromCharCode.apply(null,u8.subarray(i,i+0x8000));return btoa(s);}
+function fromB64(s){return Uint8Array.from(atob(s.replace(/\s+/g,"")),c=>c.charCodeAt(0));}
+
+async function deriveKey(pw,salt,usage){
+  const base=await crypto.subtle.importKey("raw",enc.encode(pw),"PBKDF2",false,["deriveKey"]);
+  return crypto.subtle.deriveKey({name:"PBKDF2",salt,iterations:ITER,hash:"SHA-256"},base,{name:"AES-GCM",length:256},false,usage);
+}
+async function encrypt(text,pw){
+  const salt=crypto.getRandomValues(new Uint8Array(16)), iv=crypto.getRandomValues(new Uint8Array(12));
+  const key=await deriveKey(pw,salt,["encrypt"]);
+  const ct=new Uint8Array(await crypto.subtle.encrypt({name:"AES-GCM",iv},key,enc.encode(text)));
+  const out=new Uint8Array(1+16+12+ct.length);
+  out[0]=VER; out.set(salt,1); out.set(iv,17); out.set(ct,29);
+  return toB64(out);
+}
+async function decrypt(b64,pw){
+  const d=fromB64(b64);
+  if(d[0]!==VER) throw new Error("version");
+  const key=await deriveKey(pw,d.slice(1,17),["decrypt"]);
+  const pt=await crypto.subtle.decrypt({name:"AES-GCM",iv:d.slice(17,29)},key,d.slice(29));
+  return dec.decode(pt);
+}
+
+function setMsg(text,cls){const m=$("msg");m.textContent=text;m.className=cls||"";}
+async function run(fn,okKey,btn){
+  const t=I18N[L]; setMsg("");
+  if(!$("pw").value) return setMsg(t.needpw,"err");
+  if(!$("input").value.trim()) return setMsg(t.needin,"err");
+  $("enc").disabled=$("dec").disabled=true; btn.classList.add("busy");
+  await new Promise(r=>setTimeout(r,30));
+  try{ $("output").value=await fn($("input").value,$("pw").value); setMsg(t[okKey],"good"); }
+  catch(e){ $("output").value=""; setMsg(t.fail,"err"); }
+  $("enc").disabled=$("dec").disabled=false; btn.classList.remove("busy");
+}
+
+$("enc").onclick=()=>run(encrypt,"oke",$("enc"));
+$("dec").onclick=()=>run(decrypt,"okd",$("dec"));
+$("clear").onclick=()=>{$("pw").value=$("input").value=$("output").value="";setMsg("");updateStrength();};
+$("pw").oninput=updateStrength;
+$("show").onclick=()=>{$("pw").type=$("pw").type==="password"?"text":"password";applyLang();};
+$("lang").onclick=()=>{L=L==="zh"?"en":"zh";applyLang();};
+$("theme").onclick=()=>document.documentElement.classList.toggle("green");
+$("copy").onclick=async()=>{
+  if(!$("output").value)return;
+  try{await navigator.clipboard.writeText($("output").value);}
+  catch{$("output").select();document.execCommand("copy");}
+  setMsg(I18N[L].copied,"good");
+};
+applyLang();
+</script>
+</body>
+</html>
