@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; base-uri 'none'; form-action 'none'">
-<title>CRYPT//LOCAL · AES-256-GCM</title>
+<title>TextCrypt · CRYPT//LOCAL · AES-256-GCM</title>
 <style>
 :root{--bg:#04070d;--panel:rgba(10,18,32,.78);--line:rgba(0,229,255,.28);--text:#d6f6ff;--mute:#6b8fa3;--a:#00e5ff;--b:#a855f7;--ok:#39ff88;--bad:#ff3b6b;--warn:#ffb020}
 :root.green{--line:rgba(57,255,136,.3);--a:#39ff88;--b:#00e5ff;--text:#d8ffe8;--mute:#6ba385}
@@ -57,6 +57,9 @@ textarea{height:130px;resize:vertical}
 #msg{min-height:1.4em;margin-top:14px;font-size:.85rem;letter-spacing:.04em}
 .err{color:var(--bad);text-shadow:0 0 8px var(--bad)}.good{color:var(--ok);text-shadow:0 0 8px var(--ok)}
 footer{margin-top:18px;font-size:.72rem;color:var(--mute);line-height:1.7;border-top:1px dashed var(--line);padding-top:12px}
+.credit{margin-top:14px;text-align:center;font-size:.8rem;letter-spacing:.12em;color:var(--mute)}
+.credit a{color:var(--a);text-decoration:none;text-shadow:0 0 8px var(--a)}
+.credit a:hover{text-decoration:underline}
 </style>
 </head>
 <body>
@@ -92,6 +95,7 @@ footer{margin-top:18px;font-size:.72rem;color:var(--mute);line-height:1.7;border
   <div class="actions"><button class="btn alt" id="copy"></button></div>
 </div>
 <footer id="t_foot"></footer>
+<div class="credit">Liam · X: <a href="https://x.com/LEERideTheTide" target="_blank" rel="noopener noreferrer">@LEERideTheTide</a></div>
 </div>
 
 <script>
