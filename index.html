@@ -104,12 +104,12 @@ const I18N = {
     in:"輸入 / 明文或密文",out:"輸出 / 結果",enc:"加密",dec:"解密",clear:"清除",copy:"複製結果",copied:"[OK] 已複製到剪貼簿",
     needpw:"[ERR] 請輸入密碼",needin:"[ERR] 請輸入內容",fail:"[ERR] 失敗:密碼錯誤或密文已損壞",oke:"[OK] 加密完成",okd:"[OK] 解密完成",
     weak:"強度:弱",mid:"強度:中",strong:"強度:強",empty:"建議使用 5 個以上隨機單詞",
-    foot:"密碼請透過另一渠道傳給對方。此工具不隱藏元數據,也不提供前向保密;未經第三方審計,高風險場景請使用 Signal 或 age。"},
+    foot:"密碼請透過另一渠道傳給對方。此工具不隱藏元數據,也不提供前向保密;高風險場景請使用更複雜的密碼學工具。"},
   en:{sub:"LOCAL TEXT ENCRYPTION TERMINAL",badge:"LOCAL COMPUTE · ZERO UPLOAD · NETWORK BLOCKED",pw:"PASSPHRASE",show:"SHOW",hide:"HIDE",
     in:"INPUT / PLAINTEXT OR CIPHERTEXT",out:"OUTPUT / RESULT",enc:"ENCRYPT",dec:"DECRYPT",clear:"CLEAR",copy:"COPY RESULT",copied:"[OK] Copied to clipboard",
     needpw:"[ERR] Enter a passphrase",needin:"[ERR] Enter some input",fail:"[ERR] Failed: wrong passphrase or corrupted ciphertext",oke:"[OK] Encrypted",okd:"[OK] Decrypted",
     weak:"STRENGTH: WEAK",mid:"STRENGTH: MEDIUM",strong:"STRENGTH: STRONG",empty:"Use 5+ random words",
-    foot:"Share the passphrase through a separate channel. No metadata protection or forward secrecy; not independently audited. For high-risk use, prefer Signal or age."}
+    foot:"Share the passphrase through a separate channel. No metadata protection or forward secrecy; For high-risk use, please use more complex cryptographic tools."}
 };
 let L = navigator.language.startsWith("zh") ? "zh" : "en";
 const $ = id => document.getElementById(id);
