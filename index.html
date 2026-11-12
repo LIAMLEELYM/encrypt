@@ -54,12 +54,30 @@ textarea{height:130px;resize:vertical}
 .btn.alt{background:transparent;color:var(--a);box-shadow:inset 0 0 0 1px var(--line)}
 .btn:disabled{opacity:.6;cursor:wait}
 .btn.busy::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.55),transparent);animation:scan .8s infinite}
-#msg{min-height:1.4em;margin-top:14px;font-size:.85rem;letter-spacing:.04em}
+#msg,#fmsg{min-height:1.4em;margin-top:14px;font-size:.85rem;letter-spacing:.04em;overflow-wrap:anywhere}
 .err{color:var(--bad);text-shadow:0 0 8px var(--bad)}.good{color:var(--ok);text-shadow:0 0 8px var(--ok)}
 footer{margin-top:18px;font-size:.72rem;color:var(--mute);line-height:1.7;border-top:1px dashed var(--line);padding-top:12px}
 .credit{margin-top:14px;text-align:center;font-size:.8rem;letter-spacing:.12em;color:var(--mute)}
 .credit a{color:var(--a);text-decoration:none;text-shadow:0 0 8px var(--a)}
 .credit a:hover{text-decoration:underline}
+.tabs{display:flex;margin-top:22px;border-bottom:1px solid var(--line)}
+.tab{flex:1;background:transparent;color:var(--mute);border:1px solid transparent;border-bottom:0;padding:11px 8px;font:inherit;font-size:.85rem;letter-spacing:.14em;cursor:pointer;transition:.2s}
+.tab:hover{color:var(--a)}
+.tab:disabled{cursor:wait}
+.tab[aria-selected=true]{color:var(--a);border-color:var(--line);background:rgba(0,229,255,.07);text-shadow:0 0 10px var(--a);box-shadow:inset 0 2px 0 var(--a)}
+[hidden]{display:none!important}
+.drop{margin-top:18px;border:1px dashed var(--a);padding:28px 16px;text-align:center;background:rgba(0,229,255,.03);transition:.2s;cursor:pointer;outline:none}
+.drop:hover,.drop:focus-visible,.drop.drag{background:rgba(0,229,255,.1);box-shadow:0 0 24px rgba(0,229,255,.25),inset 0 0 24px rgba(0,229,255,.08)}
+.drop .big{font-size:1.6rem;color:var(--a);text-shadow:0 0 12px var(--a);letter-spacing:.3em}
+.drop .sub{font-size:.78rem;color:var(--mute);margin-top:6px;letter-spacing:.05em}
+.finfo{margin-top:14px;display:flex;justify-content:space-between;gap:10px;font-size:.85rem;border:1px solid var(--line);padding:10px 12px;background:rgba(0,0,0,.35)}
+.finfo b{color:var(--a);overflow-wrap:anywhere;font-weight:600}
+.finfo span{white-space:nowrap;color:var(--mute)}
+.prog{margin-top:16px}
+.prog .track{height:8px;background:rgba(255,255,255,.08);border:1px solid var(--line);overflow:hidden}
+.prog .fill{height:100%;width:0;background:linear-gradient(90deg,var(--b),var(--a));box-shadow:0 0 12px var(--a);transition:width .25s}
+.prog .lab{display:flex;justify-content:space-between;font-size:.75rem;color:var(--mute);margin-top:6px;letter-spacing:.06em}
+a.btn{text-decoration:none;display:inline-block}
 </style>
 </head>
 <body>
@@ -80,19 +98,48 @@ footer{margin-top:18px;font-size:.72rem;color:var(--mute);line-height:1.7;border
   <div class="bar" id="bar"><i></i><i></i><i></i><i></i><i></i></div>
   <div class="hint" id="strength"></div>
 
-  <label id="t_in"></label>
-  <textarea id="input" spellcheck="false"></textarea>
-
-  <div class="actions">
-    <button class="btn" id="enc"></button>
-    <button class="btn" id="dec"></button>
-    <button class="btn alt" id="clear"></button>
+  <div class="tabs" role="tablist">
+    <button class="tab" id="tabText" role="tab" aria-selected="true"></button>
+    <button class="tab" id="tabFile" role="tab" aria-selected="false"></button>
   </div>
-  <div id="msg"></div>
 
-  <label id="t_out"></label>
-  <textarea id="output" readonly></textarea>
-  <div class="actions"><button class="btn alt" id="copy"></button></div>
+  <div id="paneText" role="tabpanel">
+    <label id="t_in"></label>
+    <textarea id="input" spellcheck="false"></textarea>
+
+    <div class="actions">
+      <button class="btn" id="enc"></button>
+      <button class="btn" id="dec"></button>
+      <button class="btn alt" id="clear"></button>
+    </div>
+    <div id="msg"></div>
+
+    <label id="t_out"></label>
+    <textarea id="output" readonly></textarea>
+    <div class="actions"><button class="btn alt" id="copy"></button></div>
+  </div>
+
+  <div id="paneFile" role="tabpanel" hidden>
+    <div class="drop" id="drop" tabindex="0" role="button">
+      <div class="big">⬇ ▣ ⬇</div>
+      <div id="t_drop"></div>
+      <div class="sub" id="t_dropsub"></div>
+    </div>
+    <input id="fileIn" type="file" hidden>
+    <div class="finfo" id="finfo" hidden><b id="fname"></b><span id="fsize"></span></div>
+    <div class="actions">
+      <button class="btn" id="fenc"></button>
+      <button class="btn" id="fdec"></button>
+      <button class="btn alt" id="fclear"></button>
+    </div>
+    <div class="prog" id="prog" hidden>
+      <div class="track"><div class="fill" id="fill"></div></div>
+      <div class="lab"><span id="plabel"></span><span id="ppct">0%</span></div>
+    </div>
+    <div id="fmsg"></div>
+    <div class="actions"><a class="btn" id="dl" hidden></a></div>
+    <div class="hint" id="t_ffoot"></div>
+  </div>
 </div>
 <footer id="t_foot"></footer>
 <div class="credit">Liam · X: <a href="https://x.com/LEERideTheTide" target="_blank" rel="noopener noreferrer">@LEERideTheTide</a></div>
@@ -104,17 +151,37 @@ const I18N = {
     in:"輸入 / 明文或密文",out:"輸出 / 結果",enc:"加密",dec:"解密",clear:"清除",copy:"複製結果",copied:"[OK] 已複製到剪貼簿",
     needpw:"[ERR] 請輸入密碼",needin:"[ERR] 請輸入內容",fail:"[ERR] 失敗:密碼錯誤或密文已損壞",oke:"[OK] 加密完成",okd:"[OK] 解密完成",
     weak:"強度:弱",mid:"強度:中",strong:"強度:強",empty:"建議使用 5 個以上隨機單詞",
-    foot:"密碼請透過另一渠道傳給對方。此工具不隱藏元數據,也不提供前向保密;高風險場景請使用更複雜的密碼學工具。"},
+    foot:"密碼請透過另一渠道傳給對方。此工具不隱藏元數據,也不提供前向保密;高風險場景請使用更複雜的密碼學工具。",
+    tabText:"文字 / TEXT",tabFile:"文件 / FILE",
+    drop:"拖放文件到此處,或點擊選擇",dropsub:"單個文件 · 上限 25 MiB · 整檔載入記憶體",
+    fenc:"加密文件",fdec:"解密文件",fclear:"清除文件",
+    needfile:"[ERR] 請先選擇文件",toobig:"[ERR] 文件超過 25 MiB 上限",
+    reading:"讀取文件",deriving:"導出密鑰 (PBKDF2)",encrypting:"加密中",decrypting:"解密中",finishing:"完成",
+    fok:"[OK] 文件加密完成,請下載後先測試解密",fdok:"[OK] 驗證通過,文件已解密",
+    fbad:"[ERR] 不是有效的 .tcrypt 文件",ffail:"[ERR] 失敗:密碼錯誤或文件已損壞",
+    dlEnc:"⬇ 下載加密文件",dlDec:"⬇ 下載原文件",single:"[ERR] 請一次只放一個文件",
+    ffoot:"文件模式:原檔名與類型存於加密內容中,輸出固定命名為 encrypted.tcrypt,文件大小仍可推估;只支援本頁格式,不相容 age / GPG。"},
   en:{sub:"LOCAL TEXT ENCRYPTION TERMINAL",badge:"LOCAL COMPUTE · ZERO UPLOAD · NETWORK BLOCKED",pw:"PASSPHRASE",show:"SHOW",hide:"HIDE",
     in:"INPUT / PLAINTEXT OR CIPHERTEXT",out:"OUTPUT / RESULT",enc:"ENCRYPT",dec:"DECRYPT",clear:"CLEAR",copy:"COPY RESULT",copied:"[OK] Copied to clipboard",
     needpw:"[ERR] Enter a passphrase",needin:"[ERR] Enter some input",fail:"[ERR] Failed: wrong passphrase or corrupted ciphertext",oke:"[OK] Encrypted",okd:"[OK] Decrypted",
     weak:"STRENGTH: WEAK",mid:"STRENGTH: MEDIUM",strong:"STRENGTH: STRONG",empty:"Use 5+ random words",
-    foot:"Share the passphrase through a separate channel. No metadata protection or forward secrecy; For high-risk use, please use more complex cryptographic tools."}
+    foot:"Share the passphrase through a separate channel. No metadata protection or forward secrecy; For high-risk use, please use more complex cryptographic tools.",
+    tabText:"TEXT",tabFile:"FILE",
+    drop:"Drop a file here, or click to select",dropsub:"Single file · 25 MiB max · loaded fully into memory",
+    fenc:"ENCRYPT FILE",fdec:"DECRYPT FILE",fclear:"CLEAR FILE",
+    needfile:"[ERR] Select a file first",toobig:"[ERR] File exceeds the 25 MiB limit",
+    reading:"Reading file",deriving:"Deriving key (PBKDF2)",encrypting:"Encrypting",decrypting:"Decrypting",finishing:"Done",
+    fok:"[OK] File encrypted. Download it and test decryption first",fdok:"[OK] Verified. File decrypted",
+    fbad:"[ERR] Not a valid .tcrypt file",ffail:"[ERR] Failed: wrong passphrase or corrupted file",
+    dlEnc:"⬇ DOWNLOAD ENCRYPTED FILE",dlDec:"⬇ DOWNLOAD ORIGINAL FILE",single:"[ERR] Drop one file at a time",
+    ffoot:"File mode: original name and type are stored inside the encrypted payload; output is always named encrypted.tcrypt and file size is still inferable. Only this page's format; not compatible with age / GPG."}
 };
 let L = navigator.language.startsWith("zh") ? "zh" : "en";
 const $ = id => document.getElementById(id);
 const enc = new TextEncoder(), dec = new TextDecoder();
-const ITER = 600000, VER = 1;
+const ITER = 600000, VER = 1, MAX = 25*1024*1024;
+const MAGIC = enc.encode("TCRYPT01"), HEAD = 8+1+16+12;
+let selected = null, dlUrl = null, busy = false;
 
 function applyLang(){
   const t = I18N[L];
@@ -124,6 +191,10 @@ function applyLang(){
   $("dec").textContent=t.dec; $("clear").textContent=t.clear; $("copy").textContent=t.copy;
   $("show").textContent = $("pw").type==="password" ? t.show : t.hide;
   $("t_foot").textContent=t.foot; $("lang").textContent = L==="zh" ? "EN" : "中文";
+  $("tabText").textContent=t.tabText; $("tabFile").textContent=t.tabFile;
+  $("t_drop").textContent=t.drop; $("t_dropsub").textContent=t.dropsub; $("t_ffoot").textContent=t.ffoot;
+  $("fenc").textContent=t.fenc; $("fdec").textContent=t.fdec; $("fclear").textContent=t.fclear;
+  if(!$("dl").hidden) $("dl").textContent = $("dl").dataset.kind==="enc" ? t.dlEnc : t.dlDec;
   updateStrength();
 }
 
@@ -142,6 +213,7 @@ function updateStrength(){
 
 function toB64(u8){let s="";for(let i=0;i<u8.length;i+=0x8000)s+=String.fromCharCode.apply(null,u8.subarray(i,i+0x8000));return btoa(s);}
 function fromB64(s){return Uint8Array.from(atob(s.replace(/\s+/g,"")),c=>c.charCodeAt(0));}
+function join(...a){const r=new Uint8Array(a.reduce((n,x)=>n+x.length,0));let o=0;for(const x of a){r.set(x,o);o+=x.length;}return r;}
 
 async function deriveKey(pw,salt,usage){
   const base=await crypto.subtle.importKey("raw",enc.encode(pw),"PBKDF2",false,["deriveKey"]);
@@ -164,15 +236,101 @@ async function decrypt(b64,pw){
 }
 
 function setMsg(text,cls){const m=$("msg");m.textContent=text;m.className=cls||"";}
+function setFMsg(text,cls){const m=$("fmsg");m.textContent=text;m.className=cls||"";}
+const ALL_BTNS=["enc","dec","clear","copy","fenc","fdec","fclear","tabText","tabFile"];
+function lock(on){busy=on;ALL_BTNS.forEach(id=>$(id).disabled=on);}
+
 async function run(fn,okKey,btn){
   const t=I18N[L]; setMsg("");
   if(!$("pw").value) return setMsg(t.needpw,"err");
   if(!$("input").value.trim()) return setMsg(t.needin,"err");
-  $("enc").disabled=$("dec").disabled=true; btn.classList.add("busy");
+  lock(true); btn.classList.add("busy");
   await new Promise(r=>setTimeout(r,30));
   try{ $("output").value=await fn($("input").value,$("pw").value); setMsg(t[okKey],"good"); }
   catch(e){ $("output").value=""; setMsg(t.fail,"err"); }
-  $("enc").disabled=$("dec").disabled=false; btn.classList.remove("busy");
+  lock(false); btn.classList.remove("busy");
+}
+
+function setTab(name){
+  if(busy) return;
+  $("paneText").hidden = name!=="text"; $("paneFile").hidden = name!=="file";
+  $("tabText").setAttribute("aria-selected",String(name==="text"));
+  $("tabFile").setAttribute("aria-selected",String(name==="file"));
+}
+
+function fmtSize(n){return n<1024?n+" B":n<1048576?(n/1024).toFixed(1)+" KiB":(n/1048576).toFixed(2)+" MiB";}
+function setProg(pct,label){$("prog").hidden=false;$("fill").style.width=pct+"%";$("ppct").textContent=Math.round(pct)+"%";$("plabel").textContent=label;}
+function clearDl(){if(dlUrl){URL.revokeObjectURL(dlUrl);dlUrl=null;}$("dl").hidden=true;$("dl").removeAttribute("href");}
+function pick(f){
+  if(busy) return;
+  clearDl(); setFMsg(""); $("prog").hidden=true;
+  selected=f||null;
+  $("finfo").hidden=!selected;
+  if(selected){$("fname").textContent=selected.name;$("fsize").textContent=fmtSize(selected.size);}
+}
+function readFile(f,onPct){
+  return new Promise((res,rej)=>{
+    const r=new FileReader();
+    r.onprogress=e=>{if(e.lengthComputable)onPct(e.loaded/e.total);};
+    r.onload=()=>res(new Uint8Array(r.result));
+    r.onerror=()=>rej(new Error("read"));
+    r.readAsArrayBuffer(f);
+  });
+}
+function offer(bytes,name,kind){
+  clearDl();
+  dlUrl=URL.createObjectURL(new Blob([bytes],{type:"application/octet-stream"}));
+  const a=$("dl"); a.href=dlUrl; a.download=name; a.dataset.kind=kind; a.hidden=false;
+  a.textContent = kind==="enc" ? I18N[L].dlEnc : I18N[L].dlDec;
+}
+function safeName(n){
+  const s=String(n).split(/[\\/]/).pop().replace(/[\u0000-\u001f\u007f<>:"|?*]/g,"_").slice(0,180);
+  return (!s||s==="."||s==="..") ? "decrypted-file" : s;
+}
+
+async function fileRun(kind,btn){
+  const t=I18N[L]; setFMsg(""); clearDl();
+  if(!$("pw").value) return setFMsg(t.needpw,"err");
+  if(!selected) return setFMsg(t.needfile,"err");
+  if(kind==="enc" && selected.size>MAX) return setFMsg(t.toobig,"err");
+  if(kind==="dec" && selected.size>MAX+HEAD+16+4+8192) return setFMsg(t.toobig,"err");
+  lock(true); btn.classList.add("busy");
+  try{
+    setProg(0,t.reading);
+    const data=await readFile(selected,p=>setProg(p*35,t.reading));
+    setProg(40,t.deriving);
+    await new Promise(r=>setTimeout(r,40));
+    if(kind==="enc"){
+      const meta=enc.encode(JSON.stringify({name:selected.name,type:selected.type||"application/octet-stream"}));
+      const len=new Uint8Array(4); new DataView(len.buffer).setUint32(0,meta.length);
+      const payload=join(len,meta,data);
+      const salt=crypto.getRandomValues(new Uint8Array(16)), iv=crypto.getRandomValues(new Uint8Array(12));
+      const header=join(MAGIC,new Uint8Array([VER]),salt,iv);
+      const key=await deriveKey($("pw").value,salt,["encrypt"]);
+      setProg(70,t.encrypting);
+      const ct=new Uint8Array(await crypto.subtle.encrypt({name:"AES-GCM",iv,additionalData:header,tagLength:128},key,payload));
+      setProg(100,t.finishing);
+      offer(join(header,ct),"encrypted.tcrypt","enc");
+      setFMsg(t.fok,"good");
+    }else{
+      if(data.length<HEAD+16+4 || !MAGIC.every((v,i)=>data[i]===v) || data[8]!==VER) throw new Error("fmt");
+      const header=data.slice(0,HEAD), salt=data.slice(9,25), iv=data.slice(25,37);
+      const key=await deriveKey($("pw").value,salt,["decrypt"]);
+      setProg(70,t.decrypting);
+      const raw=await crypto.subtle.decrypt({name:"AES-GCM",iv,additionalData:header,tagLength:128},key,data.slice(HEAD));
+      const bytes=new Uint8Array(raw);
+      const n=new DataView(raw).getUint32(0);
+      if(n>8192||4+n>bytes.length) throw new Error("fmt");
+      const meta=JSON.parse(dec.decode(bytes.slice(4,4+n)));
+      setProg(100,t.finishing);
+      offer(bytes.slice(4+n),safeName(meta.name),"dec");
+      setFMsg(t.fdok,"good");
+    }
+  }catch(e){
+    $("prog").hidden=true;
+    setFMsg(e.message==="fmt"?t.fbad:t.ffail,"err");
+  }
+  lock(false); btn.classList.remove("busy");
 }
 
 $("enc").onclick=()=>run(encrypt,"oke",$("enc"));
@@ -188,6 +346,24 @@ $("copy").onclick=async()=>{
   catch{$("output").select();document.execCommand("copy");}
   setMsg(I18N[L].copied,"good");
 };
+$("tabText").onclick=()=>setTab("text");
+$("tabFile").onclick=()=>setTab("file");
+$("drop").onclick=()=>{if(!busy)$("fileIn").click();};
+$("drop").onkeydown=e=>{if((e.key==="Enter"||e.key===" ")&&!busy){e.preventDefault();$("fileIn").click();}};
+$("fileIn").onchange=()=>{pick($("fileIn").files[0]);};
+["dragenter","dragover"].forEach(ev=>$("drop").addEventListener(ev,e=>{e.preventDefault();if(!busy)$("drop").classList.add("drag");}));
+["dragleave","drop"].forEach(ev=>$("drop").addEventListener(ev,e=>{e.preventDefault();$("drop").classList.remove("drag");}));
+$("drop").addEventListener("drop",e=>{
+  if(busy)return;
+  const fs=e.dataTransfer.files;
+  if(fs.length!==1){setFMsg(I18N[L].single,"err");return;}
+  pick(fs[0]);
+});
+["dragover","drop"].forEach(ev=>window.addEventListener(ev,e=>e.preventDefault()));
+$("fenc").onclick=()=>fileRun("enc",$("fenc"));
+$("fdec").onclick=()=>fileRun("dec",$("fdec"));
+$("fclear").onclick=()=>{if(busy)return;clearDl();selected=null;$("fileIn").value="";$("finfo").hidden=true;$("prog").hidden=true;setFMsg("");};
+window.addEventListener("pagehide",clearDl);
 applyLang();
 </script>
 </body>
